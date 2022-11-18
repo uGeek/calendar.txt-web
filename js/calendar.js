@@ -56,15 +56,10 @@
     var self = this;
 
     this.events.forEach(function(ev) {
-        //console.log(ev);
-
-        if("date" in ev){
+        if("date" in ev && !moment.isMoment(ev.date)){
             ev.date = moment(ev.date, "YYYY-MM-DD");
-            console.log(ev.date);
-        }else{
-            ev.date = self.current.clone().date(Math.random() * (29 - 1) + 1);
+            console.log('Converted date', ev.date);
         }
-        console.log(ev.date);
     });
 
 
