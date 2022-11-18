@@ -281,6 +281,7 @@
   }
 
   Calendar.prototype.drawLegend = function() {
+    // TODO Improve function to don't duplicate legend div on month prev/next navigate
     var legend = createElement('div', 'legend');
     var calendars = this.events.map(function(e) {
       return e.calendar + '|' + e.color;
