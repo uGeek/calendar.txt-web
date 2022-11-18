@@ -56,15 +56,10 @@
     var self = this;
 
     this.events.forEach(function(ev) {
-        //console.log(ev);
-
-        if("date" in ev){
+        if("date" in ev && !moment.isMoment(ev.date)){
             ev.date = moment(ev.date, "YYYY-MM-DD");
-            console.log(ev.date);
-        }else{
-            ev.date = self.current.clone().date(Math.random() * (29 - 1) + 1);
+            console.log('Converted date', ev.date);
         }
-        console.log(ev.date);
     });
 
 
@@ -98,9 +93,9 @@
 
     if(!dayOfWeek) { return; }
 
-    clone.subtract('days', dayOfWeek+1);
+    clone.subtract('days', dayOfWeek);
 
-    for(var i = dayOfWeek; i > 0 ; i--) {
+    for(var i = dayOfWeek; i > 1 ; i--) {
       this.drawDay(clone.add('days', 1));
     }
   }
@@ -109,9 +104,9 @@
     var clone = this.current.clone().add('months', 1).subtract('days', 1);
     var dayOfWeek = clone.day();
 
-    if(dayOfWeek === 6) { return; }
+    if(dayOfWeek === 7) { return; }
 
-    for(var i = dayOfWeek; i < 6 ; i++) {
+    for(var i = dayOfWeek; i < 7 ; i++) {
       this.drawDay(clone.add('days', 1));
     }
   }
@@ -126,7 +121,7 @@
   }
 
   Calendar.prototype.getWeek = function(day) {
-    if(!this.week || day.day() === 0) {
+    if(!this.week || day.day() === 1) {
       this.week = createElement('div', 'week');
       this.month.appendChild(this.week);
     }
@@ -256,7 +251,7 @@
 
     if(!events.length) {
       var div = createElement('div', 'event empty');
-      var span = createElement('span', '', 'No Events');
+      var span = createElement('span', '', 'Sin eventos');
 
       div.appendChild(span);
       wrapper.appendChild(div);
@@ -286,6 +281,7 @@
   }
 
   Calendar.prototype.drawLegend = function() {
+    // TODO Improve function to don't duplicate legend div on month prev/next navigate
     var legend = createElement('div', 'legend');
     var calendars = this.events.map(function(e) {
       return e.calendar + '|' + e.color;
@@ -329,41 +325,15 @@
 }();
 
 !function() {
-  var data = [
-    { date: '2022-06-01', eventName: 'Lunch Meeting w/ Mark', calendar: 'Work', color: 'orange' },
-    { date: '2022-06-02', eventName: 'Interview - Jr. Web Developer', calendar: 'Work', color: 'orange' },
-    { date: '2022-06-03', eventName: 'Demo New App to the Board', calendar: 'Work', color: 'orange' },
-    { date: '2022-06-04', eventName: 'Dinner w/ Marketing', calendar: 'Work', color: 'orange' },
 
-    { date: '2022-06-05', eventName: 'Game vs Portalnd', calendar: 'Sports', color: 'blue' },
-    { date: '2022-06-06', eventName: 'Game vs Houston', calendar: 'Sports', color: 'blue' },
-    { date: '2022-06-07', eventName: 'Game vs Denver', calendar: 'Sports', color: 'blue' },
-    { date: '2022-06-08', eventName: 'Game vs San Degio', calendar: 'Sports', color: 'blue' },
-
-    { date: '2022-06-09', eventName: 'School Play', calendar: 'Kids', color: 'yellow' },
-    { date: '2022-06-10', eventName: 'Parent/Teacher Conference', calendar: 'Kids', color: 'yellow' },
-    { date: '2022-06-11', eventName: 'Pick up from Soccer Practice', calendar: 'Kids', color: 'yellow' },
-    { date: '2022-06-12', eventName: 'Ice Cream Night', calendar: 'Kids', color: 'yellow' },
-
-    { date: '2022-06-13', eventName: 'Free Tamale Night', calendar: 'Other', color: 'green' },
-    { date: '2022-06-14', eventName: 'Bowling Team', calendar: 'Other', color: 'green' },
-    { date: '2022-06-15', eventName: 'Teach Kids to Code', calendar: 'Other', color: 'green' },
-    { date: '2022-06-16', eventName: 'Startup Weekend', calendar: 'Other', color: 'green' }
-  ];
-
-
-    read_calendar(data);
-
-  function addDate(ev) {
-
-  }
-
+    read_calendar().then( data => {
+      calendar = new Calendar('#calendar', data)
+    });
 
 }();
 
-function read_calendar(data){
-    console.log("Antes")
-    fetch( "./calendar.txt",
+function read_calendar(){
+    return fetch( "./calendar.txt",
         {
             method: "GET",
             mode: "no-cors",
@@ -372,12 +342,9 @@ function read_calendar(data){
         })
         .then(response => response.text())
         .then(text => {
-            //console.log(text);
             var data = parseContent(text);
-            console.log("Antes");
-            console.log(data);
-            console.log("Despues");
-            var calendar = new Calendar('#calendar', data);
+            console.log("Calendar.txt:\n", data);
+            return data;
         })
         .catch(err => console.log("Solicitud fallida", err));
 }
@@ -387,8 +354,8 @@ function parseContent(content){
     content.split("\n").forEach(item => {
         const regex = /(\d{4}-\d{2}-\d{2})\sW\d{2}\s\w{3}\s(.*)/
         const array = regex.exec(item);
-        if(array != null && array.length > 2){
-            let parsedItem = {date: array[1], eventName: array[2], calendar: "Angel", color: "blue"};
+        if(array != null && array[2]){ // Only with event description (like "2022-11-29 W26 mar 18:00 Cine" not "2022-11-29 W26 mar")
+            let parsedItem = {date: moment(array[1], "YYYY-MM-DD"), eventName: array[2], calendar: "Angel", color: "blue"};
             data.push(parsedItem);
         }
     });
