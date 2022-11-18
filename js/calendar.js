@@ -93,9 +93,9 @@
 
     if(!dayOfWeek) { return; }
 
-    clone.subtract('days', dayOfWeek+1);
+    clone.subtract('days', dayOfWeek);
 
-    for(var i = dayOfWeek; i > 0 ; i--) {
+    for(var i = dayOfWeek; i > 1 ; i--) {
       this.drawDay(clone.add('days', 1));
     }
   }
@@ -104,9 +104,9 @@
     var clone = this.current.clone().add('months', 1).subtract('days', 1);
     var dayOfWeek = clone.day();
 
-    if(dayOfWeek === 6) { return; }
+    if(dayOfWeek === 7) { return; }
 
-    for(var i = dayOfWeek; i < 6 ; i++) {
+    for(var i = dayOfWeek; i < 7 ; i++) {
       this.drawDay(clone.add('days', 1));
     }
   }
@@ -121,7 +121,7 @@
   }
 
   Calendar.prototype.getWeek = function(day) {
-    if(!this.week || day.day() === 0) {
+    if(!this.week || day.day() === 1) {
       this.week = createElement('div', 'week');
       this.month.appendChild(this.week);
     }
