@@ -329,41 +329,15 @@
 }();
 
 !function() {
-  var data = [
-    { date: '2022-06-01', eventName: 'Lunch Meeting w/ Mark', calendar: 'Work', color: 'orange' },
-    { date: '2022-06-02', eventName: 'Interview - Jr. Web Developer', calendar: 'Work', color: 'orange' },
-    { date: '2022-06-03', eventName: 'Demo New App to the Board', calendar: 'Work', color: 'orange' },
-    { date: '2022-06-04', eventName: 'Dinner w/ Marketing', calendar: 'Work', color: 'orange' },
 
-    { date: '2022-06-05', eventName: 'Game vs Portalnd', calendar: 'Sports', color: 'blue' },
-    { date: '2022-06-06', eventName: 'Game vs Houston', calendar: 'Sports', color: 'blue' },
-    { date: '2022-06-07', eventName: 'Game vs Denver', calendar: 'Sports', color: 'blue' },
-    { date: '2022-06-08', eventName: 'Game vs San Degio', calendar: 'Sports', color: 'blue' },
-
-    { date: '2022-06-09', eventName: 'School Play', calendar: 'Kids', color: 'yellow' },
-    { date: '2022-06-10', eventName: 'Parent/Teacher Conference', calendar: 'Kids', color: 'yellow' },
-    { date: '2022-06-11', eventName: 'Pick up from Soccer Practice', calendar: 'Kids', color: 'yellow' },
-    { date: '2022-06-12', eventName: 'Ice Cream Night', calendar: 'Kids', color: 'yellow' },
-
-    { date: '2022-06-13', eventName: 'Free Tamale Night', calendar: 'Other', color: 'green' },
-    { date: '2022-06-14', eventName: 'Bowling Team', calendar: 'Other', color: 'green' },
-    { date: '2022-06-15', eventName: 'Teach Kids to Code', calendar: 'Other', color: 'green' },
-    { date: '2022-06-16', eventName: 'Startup Weekend', calendar: 'Other', color: 'green' }
-  ];
-
-
-    read_calendar(data);
-
-  function addDate(ev) {
-
-  }
-
+    read_calendar().then( data => {
+      calendar = new Calendar('#calendar', data)
+    });
 
 }();
 
-function read_calendar(data){
-    console.log("Antes")
-    fetch( "./calendar.txt",
+function read_calendar(){
+    return fetch( "./calendar.txt",
         {
             method: "GET",
             mode: "no-cors",
@@ -372,12 +346,9 @@ function read_calendar(data){
         })
         .then(response => response.text())
         .then(text => {
-            //console.log(text);
             var data = parseContent(text);
-            console.log("Antes");
-            console.log(data);
-            console.log("Despues");
-            var calendar = new Calendar('#calendar', data);
+            console.log("Calendar.txt:\n", data);
+            return data;
         })
         .catch(err => console.log("Solicitud fallida", err));
 }
