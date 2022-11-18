@@ -387,8 +387,8 @@ function parseContent(content){
     content.split("\n").forEach(item => {
         const regex = /(\d{4}-\d{2}-\d{2})\sW\d{2}\s\w{3}\s(.*)/
         const array = regex.exec(item);
-        if(array != null && array.length > 2){
-            let parsedItem = {date: array[1], eventName: array[2], calendar: "Angel", color: "blue"};
+        if(array != null && array[2]){ // Only with event description (like "2022-11-29 W26 mar 18:00 Cine" not "2022-11-29 W26 mar")
+            let parsedItem = {date: moment(array[1], "YYYY-MM-DD"), eventName: array[2], calendar: "Angel", color: "blue"};
             data.push(parsedItem);
         }
     });
